@@ -11,6 +11,7 @@ from fastapi.responses import HTMLResponse
 import datetime
 import secrets
 import random
+import datetime
 from requests import get
 
 # docker
@@ -78,7 +79,12 @@ def read_root(): # will change later, security flaws
 # route for getting recomendation just from an user id without any additional data
 # returns a list of video 
 @app.get("/run_image/{image_id}")
-def user_recom(image_id: str, user: User):
+def user_recom(image_id: str, user: User, request: Request):
+    client_host = request.client.host
+    dt = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    # log the client host
+    ip_logger = open("ip_logger.txt", "a+")
+    ip_logger.write(f"{client_host}, {dt}.")
     correct_username = secrets.compare_digest(user.username, server_config.uname)
     correct_password = secrets.compare_digest(user.password, server_config.pword)
     if not (correct_username and correct_password):
